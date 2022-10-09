@@ -4,6 +4,7 @@ if ! grep -q hybris /system/etc/ld.config.29.txt; then
     mount -o bind /usr/libexec/droid-hybris/system/etc/ld.config.29.txt /system/etc/ld.config.29.txt
 fi
 mount -o bind /system/lib64/hw/audio.hidl_compat.default.so /vendor/lib64/hw/audio.primary.default.so
+mount -o bind /dev/null /vendor/etc/init/hw/init.samsungexynos7880.usb.rc
 
 if [[ ! -e /mnt/vendor ]]; then
     mkdir -p /mnt/vendor
