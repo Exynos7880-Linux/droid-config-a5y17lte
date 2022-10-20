@@ -4,6 +4,7 @@
 %package -n patterns-sailfish-device-adaptation-a5y17lte
 Summary: Jolla HW Adaptation a5y17lte
 Requires: droid-hal-a5y17lte
+Requires: droid-system-a5y17lte
 Requires: droid-hal-a5y17lte-img-boot
 Requires: droid-hal-a5y17lte-kernel-modules
 Requires: droid-config-a5y17lte-sailfish
