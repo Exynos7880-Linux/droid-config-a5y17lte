@@ -14,7 +14,7 @@ part / --size 500 --ondisk sda --fstype=ext4
 ## No suitable configuration found in /tmp/sandbox/usr/share/ssu/kickstart/bootloader
 
 repo --name=adaptation-common-a5y17lte-@RELEASE@ --baseurl=https://releases.jolla.com/releases/@RELEASE@/jolla-hw/adaptation-common/@ARCH@/
-repo --name=adaptation-community-a5y17lte-@RELEASE@ --baseurl=file:///home/ayman/hybris/droid-local-repo/a5y17lte/repo
+repo --name=adaptation-community-a5y17lte-@RELEASE@ --baseurl=https://exynos7880-linux.github.io/repo/@RELEASE@/a5y17lte/
 repo --name=adaptation-community-common-a5y17lte-@RELEASE@ --baseurl=https://repo.sailfishos.org/obs/nemo:/devel:/hw:/common/sailfish_latest_@ARCH@/
 repo --name=apps-@RELEASE@ --baseurl=https://releases.jolla.com/jolla-apps/@RELEASE@/@ARCH@/
 repo --name=customer-jolla-@RELEASE@ --baseurl=https://releases.jolla.com/features/@RELEASE@/customers/jolla/@ARCH@/
@@ -174,16 +174,18 @@ fi
 DST_IMG_BASE=$ID-$DEVICE-$SAILFISH_FLAVOUR-$VERSION_ID@EXTRA_NAME@
 DST_IMG=$DST_IMG_BASE.tar.bz2
 
-# extracting DST_IMG to rootfs.img
+
+# extracting $GEN_IMG_BASE.tar.bz2 to rootfs.img
 mkdir data
 mkdir rootfs
 
 truncate -s3G data/rootfs.img
 /sbin/mke2fs -t ext4 -O extents,uninit_bg,dir_index,has_journal,flex_bg,huge_file,extra_isize,dir_nlink,uninit_bg data/rootfs.img
 mount -o loop data/rootfs.img rootfs
-tar --numeric-owner -xjf "$DST_IMG" -C rootfs
+tar --numeric-owner -xjf "$GEN_IMG_BASE.tar.bz2" -C rootfs
 umount rootfs
 rm -rf rootfs
+rm $GEN_IMG_BASE.tar.bz2
 
 DST_IMG=data/rootfs.img
 
@@ -209,7 +211,7 @@ popd # updater
 
 # Clean up updater .zip working directory.
 rm -rf updater
-rm -rf updater/data
+rm -rf data
 
 popd # $IMG_OUT_DIR
 ### end hybris
