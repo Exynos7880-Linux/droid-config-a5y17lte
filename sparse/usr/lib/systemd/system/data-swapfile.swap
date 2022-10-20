@@ -1,0 +1,15 @@
+  GNU nano 6.4                                                 sparse/usr/lib/systemd/system/dev-zram0.swap                                                           
+[Unit]
+Description=Enable swap target
+ConditionPathExists=/data/swapfile
+DefaultDependencies=false
+Conflicts=shutdown.target
+After=swap.service
+Requires=swap.service
+
+[Swap]
+What=/data/swapfile
+Priority=100
+
+[Install]
+WantedBy=basic.target

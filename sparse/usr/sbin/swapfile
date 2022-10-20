@@ -1,0 +1,9 @@
+#!/bin/bash
+
+while [ ! -e /data/swapfile ]
+do
+  fallocate -l 2G /data/swapfile
+  chmod 600 /data/swapfile
+  mkswap /data/swapfile
+  break;
+done
