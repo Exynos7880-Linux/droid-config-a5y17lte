@@ -1,4 +1,3 @@
-  GNU nano 6.4                                                 sparse/usr/lib/systemd/system/dev-zram0.swap                                                           
 [Unit]
 Description=Enable swap target
 ConditionPathExists=/data/swapfile
