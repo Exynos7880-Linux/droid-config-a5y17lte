@@ -170,33 +170,44 @@ if [ ! -e "$GEN_IMG_BASE.tar.bz2" ]; then
     exit 1
 fi
 
-IMG_SIZE=$(du -h $GEN_IMG_BASE.tar.bz2 | cut -f1)
-
 # Output filenames
 DST_IMG_BASE=$ID-$DEVICE-$SAILFISH_FLAVOUR-$VERSION_ID@EXTRA_NAME@
 DST_IMG=$DST_IMG_BASE.tar.bz2
 
+# extracting DST_IMG to rootfs.img
+mkdir data
+mkdir rootfs
+
+truncate -s3G data/rootfs.img
+root=$(losetup --show --find data/rootfs.img); echo "$rootimg"
+mkfs.ext4 data/rootfs.img
+mount "$rootimg" rootfs
+tar --numeric-owner -xjf "$DST_IMG" -C rootfs
+umount "$rootimg"
+losetup -d "$rootimg"
+rm -rf rootfs
+
+DST_IMG=data/rootfs.img
+
+IMG_SIZE=$(du -h $DST_IMG | cut -f1)
+
 # Copy boot image, updater scripts and updater binary into updater .zip tree.
 mkdir -p updater/META-INF/com/google/android
+mkdir -p updater/data
 
 mv update-binary updater/META-INF/com/google/android/update-binary
 mv hybris-updater-script updater/META-INF/com/google/android/updater-script
 mv hybris-updater-unpack.sh updater/updater-unpack.sh
 mv hybris-boot.img updater/hybris-boot.img
-
-# Temporarily move the rootfs into the updater directory
-mv $GEN_IMG_BASE.tar.bz2 updater/$DST_IMG
+mv data/rootfs.img updater/data/rootfs.img
 
 # Update updater-script with image details.
 sed -i -e "s %VERSION% $VERSION_ID g" -e "s %IMAGE_FILE% $DST_IMG g" -e "s %IMAGE_SIZE% $IMG_SIZE g" updater/META-INF/com/google/android/updater-script
 
 # pack updater .zip
 pushd updater
-zip -r ../$DST_IMG_BASE.zip META-INF/com/google/android/update-binary META-INF/com/google/android/updater-script updater-unpack.sh hybris-boot.img $DST_IMG_BASE.ks $DST_IMG
+zip -r ../$DST_IMG_BASE.zip META-INF/com/google/android/update-binary META-INF/com/google/android/updater-script updater-unpack.sh hybris-boot.img $DST_IMG_BASE.ks data/rootfs.img
 popd # updater
-
-# Move the rootfs back out of the updater directory
-mv updater/$DST_IMG $GEN_IMG_BASE.tar.bz2
 
 # Clean up updater .zip working directory.
 rm -rf updater
